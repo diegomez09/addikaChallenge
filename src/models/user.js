@@ -21,7 +21,7 @@ module.exports = (sequelize, type) => {
             allowNull: false
         },
         permissions:{
-            type: type.BOOLEAN,
+            type: type.STRING,
             allowNull: false
         }
     })
