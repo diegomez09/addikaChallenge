@@ -75,7 +75,6 @@ router.post("/login", async (req, res) => {
     return res.status(200).json({
         success: true,
         user,
-        id: user.id,
         token,
         expireIn
     });
