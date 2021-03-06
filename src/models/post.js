@@ -13,8 +13,7 @@ module.exports = (sequelize, type) => {
         },
         author: {
             type: type.STRING,
-            allowNull: false,
-            unique: true
+            allowNull: false
         },
         body: {
             type: type.STRING,
