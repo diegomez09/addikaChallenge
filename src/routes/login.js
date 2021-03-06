@@ -41,7 +41,9 @@ const SEED = require("../config/config").SEED;
  */
 router.post("/login", async (req, res) => {
     var body = req.body;
-    const user = await User.findOne({ where: { email: body.email } });
+    const user = await User.findOne({
+        where: { email: body.email }
+    });
     if (user == null) {
         return res.status(400).json({
             success: false,
