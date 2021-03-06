@@ -31,15 +31,17 @@ const { check, calidationResult, validationResult } = require('express-validator
     "data": {
         "role": "admin",
         "email": "admin@mail.com",
-        "password": ":D"
+        "password": ":D",
+        "permissions":true
     }
     }
   */
 router.post('/user', [
-    verifyToken,
+    //verifyToken,
     check('role', 'Role is required').not().isEmpty(),
     check('email', 'Email is required').not().isEmpty(),
-    check('password', 'Password is required').not().isEmpty()
+    check('password', 'Password is required').not().isEmpty(),
+    check('permissions','Permissions is required')
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(422).json({ error: errors.array() });
@@ -65,8 +67,6 @@ router.post('/user', [
  * @apiDescription This method returns all the users registered in the data base
  * @apiVersion  1.0.0
  * @apiParam  {String} token JWT
- * @apiParam  {String} from OPTIONAL VALUE: Send this parameter to do a pagination of the service. This param specify the number or row will start to return
- * @apiParam  {String} limit OPTIONAL VALUE:  Send this parameter to do a pagination of the service. Thhis param specify the total of rows to return.
  * 
  * @apiSuccessExample {type} Success-Response:
  * {
@@ -77,7 +77,7 @@ router.post('/user', [
             "id": 1,
             "role": "admin",
             "email": "admin@mail.com",
-            "password": "$2a$10$ul2eLvMoBBEIouO96MLtKu57SxXEHmu4gvlI0wZm83cIn03MyZslG",
+            "permissions":true
             "createdAt": "2021-03-06T19:19:41.000Z",
             "updatedAt": "2021-03-06T19:19:41.000Z"
         }
