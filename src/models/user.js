@@ -19,6 +19,10 @@ module.exports = (sequelize, type) => {
         password: {
             type: type.STRING,
             allowNull: false
+        },
+        permissions:{
+            type: type.BOOLEAN,
+            allowNull: false
         }
     })
 }
