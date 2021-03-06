@@ -4,6 +4,7 @@
 const express = require('express')
 const router = new express.Router();
 const bcryptjs = require('bcryptjs');
+const { verifyToken } = require("../middleware/auth");
 const { User } = require('../config/db');
 const { check, calidationResult, validationResult } = require('express-validator');
 // ===========================
@@ -11,7 +12,7 @@ const { check, calidationResult, validationResult } = require('express-validator
 // ===========================
 
 /**
-  * @api {POST} /user Create new user
+  * @api {POST} /user?token={token} Create new user
   * @apiGroup User
   * @apiDescription This method adds a new user in the database
   * @apiVersion  1.0.0
@@ -35,6 +36,7 @@ const { check, calidationResult, validationResult } = require('express-validator
     }
   */
 router.post('/user', [
+    verifyToken,
     check('role', 'Role is required').not().isEmpty(),
     check('email', 'Email is required').not().isEmpty(),
     check('password', 'Password is required').not().isEmpty()
@@ -55,5 +57,44 @@ router.post('/user', [
             error: e
         })
     }
+})
+
+/**
+ * @api {GET} /user?token={token} Get All Users
+ * @apiGroup User
+ * @apiDescription This method returns all the users registered in the data base
+ * @apiVersion  1.0.0
+ * @apiParam  {String} token JWT
+ * @apiParam  {String} from OPTIONAL VALUE: Send this parameter to do a pagination of the service. This param specify the number or row will start to return
+ * @apiParam  {String} limit OPTIONAL VALUE:  Send this parameter to do a pagination of the service. Thhis param specify the total of rows to return.
+ * 
+ * @apiSuccessExample {type} Success-Response:
+ * {
+    "succes": true,
+    "total": 1,
+    "data": [
+        {
+            "id": 1,
+            "role": "admin",
+            "email": "admin@mail.com",
+            "password": "$2a$10$ul2eLvMoBBEIouO96MLtKu57SxXEHmu4gvlI0wZm83cIn03MyZslG",
+            "createdAt": "2021-03-06T19:19:41.000Z",
+            "updatedAt": "2021-03-06T19:19:41.000Z"
+        }
+    ]
+    }
+ * 
+ */
+router.get('/user', [verifyToken], async (req, res) => {
+    const users = await User.findAll({
+        attributes:{
+            exclude: ['password']
+        }
+    });
+    return res.status(200).json({
+        succes: true,
+        total: users.length,
+        data: users
+    });
 })
 module.exports = router;
