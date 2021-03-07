@@ -26,11 +26,34 @@ const User = UserModel(sequelize, Sequelize);
 const Post = PostModel(sequelize, Sequelize);
 const Review = ReviewModel(sequelize, Sequelize);
 const Log = LogModel(sequelize, Sequelize);
-
+//Insert new users
+const users = [
+  {
+    role: 'ADMIN',
+    email: 'admin@mail.com',
+    //Password:123456
+    password: '$2a$10$VrySnTUF.TaT5PZSpJICWuCXD1Uy/YJ.v9x0LuGaYUDkESDIkp17m',
+    permissions: 'ADMIN'
+  }, {
+    role: 'USER',
+    email: 'create@mail.com',
+    //Password:123456
+    password: '$2a$10$rPMUOlwMo7lqazIPKAf7NeLftJzK2VrVKjA0hJItW6ksgpgOcgyFS',
+    permissions: 'CREATE'
+  }, {
+    role: 'USER',
+    email: 'update@mail.com',
+    //Password:123456
+    password: '$2a$10$zCsaA/ohgfae1QrPVoGn7ORVBKtqUaPMUF9MOCTChupDx8zdHbAjC',
+    permissions: 'update'
+  }
+];
 // Post.hasMany(Review, { foreignKey: 'review' });
-sequelize.sync({ force: false })
+sequelize.sync({ force: true })
   .then(() => {
     console.log('Tablas creadas');
+  }).then(() => {
+    users.forEach(user => User.create(user));
   });
 
 module.exports = {
