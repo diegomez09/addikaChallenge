@@ -6,9 +6,9 @@ var SEED = require('../config/config').SEED;
 //==============
 
 let verifyToken = (req, res, next) => {
-    let token = req.query.token;
+    const autHeader = req.headers['authorization'];
+    const token = autHeader && autHeader.split(' ')[1]
     jwt.verify(token, SEED, (error, decoded) => {
-
         //Verify errors
         if (error) {
             return res.status(403).json({
@@ -17,7 +17,6 @@ let verifyToken = (req, res, next) => {
                 message: "Invalid token"
             });
         }
-
         req.user = decoded.user;
         next();
     });
