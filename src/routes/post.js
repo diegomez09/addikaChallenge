@@ -3,9 +3,8 @@
 // ===========================
 const express = require('express')
 const router = new express.Router();
-const bcryptjs = require('bcryptjs');
 const { verifyToken } = require("../middleware/auth");
-const { Post } = require('../config/db');
+const { Post, Log } = require('../config/db');
 const { check, validationResult } = require('express-validator');
 const { create, update } = require('../middleware/role');
 const { Op } = require('sequelize');
@@ -45,6 +44,7 @@ router.post('/post',
     async (req, res) => {
         try {
             const post = await Post.create(req.body);
+            await log(req.user.id, req.method, post.id);
             return res.status(200).json({
                 succes: true,
                 data: post
@@ -91,7 +91,6 @@ router.get('/post',
         let startDate = req.query.startDate || new Date(0, 0, 0).toISOString().slice(0, 19).replace('T', ' ');
         let endDate = req.query.endDate || new Date(now).toISOString().slice(0, 19).replace('T', ' ');
         let week = new Date(now - 604800000).toISOString().slice(0, 19).replace('T', ' ');
-        console.log(week);
         await Post.update(
             {
                 week: true
@@ -108,6 +107,11 @@ router.get('/post',
             offset: from,
             limit: limit,
             order: [['createdAt', sortDate]]
+            // include: [{
+            //     model: Review,
+            //     as: 'review',
+            //     attributes: ['body', 'createdAt']
+            // }]
         }).then((posts) => {
             return res.status(200).json({
                 succes: true,
@@ -125,8 +129,6 @@ router.get('/post',
   * @apiDescription This method adds a new post in the database
   * @apiVersion  1.0.0
   * @apiParam  {String} id Id of the document to be updated
-  * @apiParam  {String} token JWT
-  * @apiParam  {String} role string
   * 
   *  @apiParamExample  {type} Request-Example:
    {
@@ -157,9 +159,10 @@ router.put("/post/:id",
         await Post.update(req.body, {
             where: { id: req.params.id }
         });
+        await log(req.user.id, req.method, req.params.id);
         await Post.findByPk(req.params.id, {
             where: { id: req.params.id }
-        }).then(function (post) {
+        }).then((post) =>{
             return res.status(200).json({
                 success: true,
                 post: post,
@@ -196,6 +199,7 @@ router.delete("/post/:id",
         const postUpdate = await Post.findByPk(req.params.id, {
             where: { id: req.params.id },
         });
+        await log(req.user.id, req.method, id);
         await Post.destroy({
             where: { id: id }
         });
@@ -204,4 +208,16 @@ router.delete("/post/:id",
             post: postUpdate
         });
     });
+
+// ===========================
+//  Log data
+// ===========================    
+async function log(userId, method, idPost) {
+    let log = {
+        userId: userId,
+        action: method,
+        postId: idPost
+    }
+    await Log.create(log);
+}
 module.exports = router;
