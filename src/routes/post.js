@@ -8,6 +8,7 @@ const { verifyToken } = require("../middleware/auth");
 const { Post } = require('../config/db');
 const { check, validationResult } = require('express-validator');
 const { create, update } = require('../middleware/role');
+const { Op } = require('sequelize');
 // ===========================
 // Initializations
 // ===========================
@@ -81,16 +82,43 @@ router.post('/post',
  * 
  */
 router.get('/post',
-    create,
     async (req, res) => {
-        const posts = await Post.findAll({});
-        return res.status(200).json({
-            succes: true,
-            total: posts.length,
-            data: posts
-        });
+        let zeroDate = new Date(0, 0, 0).toISOString().slice(0, 19).replace('T', ' ');
+        let now = Date.now();
+        let from = req.query.from || 0;
+        let limit = req.query.limit || null;
+        let sortDate = req.query.sort || 'DESC';
+        let startDate = req.query.startDate || new Date(0, 0, 0).toISOString().slice(0, 19).replace('T', ' ');
+        let endDate = req.query.endDate || new Date(now).toISOString().slice(0, 19).replace('T', ' ');
+        let week = new Date(now - 604800000).toISOString().slice(0, 19).replace('T', ' ');
+        console.log(week);
+        await Post.update(
+            {
+                week: true
+            },
+            {
+                where: {
+                    "createdAt": { [Op.between]: [zeroDate, week] }
+                }
+            });
+        await Post.findAll({
+            where: {
+                "createdAt": { [Op.between]: [startDate, endDate] }
+            },
+            offset: from,
+            limit: limit,
+            order: [['createdAt', sortDate]]
+        }).then((posts) => {
+            return res.status(200).json({
+                succes: true,
+                total: posts.length,
+                data: posts
+            })
+        }).catch((error) => res.status(404).json({
+            succes: false,
+            errorInfo: error
+        }));
     })
-
 /**
   * @api {PUT} /post/{id} Update post
   * @apiGroup Post
@@ -116,24 +144,26 @@ router.get('/post',
         "author": "Diegsdoss",
         "body": "UN resumen",
         "review": null,
-        "createdAt": "2021-03-07T02:04:51.000Z",
-        "updatedAt": "2021-03-07T02:37:51.000Z"
-    }
+        "week": null,
+        "createdAt": "2021-03-07T04:46:39.000Z",
+        "updatedAt": "2021-03-07T04:55:20.000Z"
+        }
     }
   */
 router.put("/post/:id",
     verifyToken,
     update,
     async (req, res) => {
-        const post = await Post.update(req.body, {
-            where: { id: req.params.id }
-        }).catch();
-        const postUpdate = await Post.findByPk(req.params.id, {
+        await Post.update(req.body, {
             where: { id: req.params.id }
         });
-        return res.status(200).json({
-            success: true,
-            post: postUpdate,
+        await Post.findByPk(req.params.id, {
+            where: { id: req.params.id }
+        }).then(function (post) {
+            return res.status(200).json({
+                success: true,
+                post: post,
+            });
         });
     });
 
@@ -152,6 +182,7 @@ router.put("/post/:id",
         "title": "Titulolo",
         "body": "UN resumen",
         "review": null,
+        "week":null,
         "createdAt": "2021-03-07T02:38:20.000Z",
         "updatedAt": "2021-03-07T02:38:20.000Z"
     }
@@ -164,11 +195,10 @@ router.delete("/post/:id",
         let id = req.params.id;
         const postUpdate = await Post.findByPk(req.params.id, {
             where: { id: req.params.id },
-            attributes: { exclude: ['author'] }
         });
         await Post.destroy({
             where: { id: id }
-        })
+        });
         return res.status(200).json({
             success: true,
             post: postUpdate
