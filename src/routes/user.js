@@ -137,7 +137,7 @@ router.put("/user/:id",
     verifyToken,
     adminRole,
     async (req, res) => {
-        const user = await User.update(req.body, {
+        await User.update(req.body, {
             where: { id: req.params.id }
         }).catch();
         const userUpdate = await User.findByPk(req.params.id, {
