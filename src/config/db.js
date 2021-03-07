@@ -7,6 +7,7 @@ const Sequelize = require('sequelize');
 // ===========================
 const UserModel = require('../models/user');
 const PostModel = require('../models/post');
+const ReviewModel = require('../models/review');
 //Initialize connection
 const sequelize = new Sequelize('addika', 'user', 'rFdzPKkb3N', {
   host: 'localhost',
@@ -22,6 +23,7 @@ const sequelize = new Sequelize('addika', 'user', 'rFdzPKkb3N', {
 
 const User = UserModel(sequelize, Sequelize);
 const Post = PostModel(sequelize, Sequelize);
+const Review = ReviewModel(sequelize, Sequelize);
 
 sequelize.sync({ force: false })
   .then(() => {
@@ -30,5 +32,6 @@ sequelize.sync({ force: false })
 
 module.exports = {
   User,
-  Post
+  Post,
+  Review
 }
