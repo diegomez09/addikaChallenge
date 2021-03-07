@@ -48,7 +48,7 @@ const users = [
     permissions: 'update'
   }
 ];
-// Post.hasMany(Review, { foreignKey: 'review' });
+
 sequelize.sync({ force: true })
   .then(() => {
     console.log('Tablas creadas');
