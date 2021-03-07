@@ -11,6 +11,8 @@ const bodyParser = require('body-parser');
 const userRouter = require('./routes/user')
 const loginRouter = require('./routes/login');
 const postRouter = require('./routes/post');
+const reviewRouter = require('./routes/review');
+const logRouter = require('./routes/log');
 // ===========================
 // Initializations
 // ===========================
@@ -22,6 +24,8 @@ app.use(bodyParser.json())
 app.use(userRouter);
 app.use(loginRouter);
 app.use(postRouter);
+app.use(reviewRouter);
+app.use(logRouter);
 // ===========================
 // Middleware
 // ===========================
