@@ -17,6 +17,7 @@ const { Op } = require('sequelize');
   * @apiGroup Post
   * @apiDescription This method adds a new post in the database
   * @apiVersion  1.0.0
+  * @apiAuth Bearer Token {token}
   * 
   *  @apiParamExample  {type} Request-Example:
    {
@@ -129,6 +130,7 @@ router.get('/post',
   * @apiDescription This method adds a new post in the database
   * @apiVersion  1.0.0
   * @apiParam  {String} id Id of the document to be updated
+  * @apiAuth Bearer Token {token}
   * 
   *  @apiParamExample  {type} Request-Example:
    {
@@ -176,6 +178,7 @@ router.put("/post/:id",
    * @apiDescription This method do a logical delete of the post from de database
    * @apiVersion  1.0.0
    * @apiParam  {String} id Id of the document to be deleted
+   * @apiAuth Bearer Token {token}
    * 
    * @apiSuccessExample {type} Success-Response:
    * {
