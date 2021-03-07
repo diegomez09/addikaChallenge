@@ -13,19 +13,17 @@ const { adminRole } = require('../middleware/role');
 // ===========================
 
 /**
-  * @api {POST} /user?token={token}&role={role} Create new user
+  * @api {POST} /user Create new user
   * @apiGroup User
   * @apiDescription This method adds a new user in the database
   * @apiVersion  1.0.0
-  * @apiParam  {String} token JWT
-  * @apiParam  {String} role string
   * 
   *  @apiParamExample  {type} Request-Example:
    {
    "role":"ADMIN",
    "email":"admin@mail.com",
    "password":"123456",
-   "permissions":"ALL"
+   "permissions":"ADMIN"
     }
   *
   * @apiSuccessExample {type} Success-Response:
@@ -35,16 +33,17 @@ const { adminRole } = require('../middleware/role');
         "role": "ADMIN",
         "email": "admin@mail.com",
         "password": ":D",
-        "permissions":"ALL"
+        "permissions":"ADMIN"
     }
     }
   */
 router.post('/user', [
-    //verifyToken,
+    verifyToken,
+    adminRole,
     check('role', 'Role is required').not().isEmpty(),
     check('email', 'Email is required').not().isEmpty(),
     check('password', 'Password is required').not().isEmpty(),
-    check('permissions', 'Permissions is required')
+    check('permissions', 'Permissions is required').not().isEmpty()
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(422).json({ error: errors.array() });
@@ -65,7 +64,7 @@ router.post('/user', [
 })
 
 /**
- * @api {GET} /user?token={token}&role={role} Get All Users
+ * @api {GET} /user Get All Users
  * @apiGroup User
  * @apiDescription This method returns all the users registered in the data base
  * @apiVersion  1.0.0
@@ -90,7 +89,8 @@ router.post('/user', [
  * 
  */
 router.get('/user',
-    //[verifyToken],
+    verifyToken,
+    adminRole,
     async (req, res) => {
         const users = await User.findAll({
             attributes: {
@@ -105,7 +105,7 @@ router.get('/user',
     })
 
 /**
-  * @api {PUT} /user/{id}?token={token}&role={role} Update user
+  * @api {PUT} /user/{id} Update user
   * @apiGroup User
   * @apiDescription This method adds a new user in the database
   * @apiVersion  1.0.0
@@ -117,7 +117,7 @@ router.get('/user',
    {
     "role":"admin",
     "email":"admin@mail.com",
-    "permissions":"ALL"
+    "permissions":"ADMIN"
 }
   *
   * @apiSuccessExample {type} Success-Response:
@@ -127,14 +127,15 @@ router.get('/user',
         "id": 1,
         "role": "admin",
         "email": "admin@mail.com",
-        "permissions": "ALL",
+        "permissions": "ADMIN",
         "createdAt": "2021-03-06T20:21:18.000Z",
         "updatedAt": "2021-03-06T23:09:10.000Z"
     }
 }
   */
 router.put("/user/:id",
-    //[verifyToken],
+    verifyToken,
+    adminRole,
     async (req, res) => {
         const user = await User.update(req.body, {
             where: { id: req.params.id }
@@ -150,14 +151,11 @@ router.put("/user/:id",
     });
 
 /**
-   * @api {DELETE} /user/{id}?token={token}&role{role} Delete user
+   * @api {DELETE} /user/{id} Delete user
    * @apiGroup User
    * @apiDescription This method do a logical delete of the user from de database
    * @apiVersion  1.0.0
    * @apiParam  {String} id Id of the document to be deleted
-   * @apiParam  {String} token JWT
-   * @apiParam  {String} role string
-   * 
    * @apiSuccessExample {type} Success-Response:
    * {
     "success": true,
@@ -165,26 +163,27 @@ router.put("/user/:id",
         "id": 1,
         "role": "ADMIN",
         "email": "admin@mail.com",
-        "permissions": "ALL",
+        "permissions": "ADMIN",
         "createdAt": "2021-03-06T23:20:29.000Z",
         "updatedAt": "2021-03-06T23:20:29.000Z"
     }
 }
    */
 router.delete("/user/:id",
- //[verifyToken],
-  async (req, res) => {
-    let id = req.params.id;
-    const userUpdate = await User.findByPk(req.params.id, {
-        where: { id: req.params.id },
-        attributes: { exclude: ['password'] }
+    verifyToken,
+    adminRole,
+    async (req, res) => {
+        let id = req.params.id;
+        const userUpdate = await User.findByPk(req.params.id, {
+            where: { id: req.params.id },
+            attributes: { exclude: ['password'] }
+        });
+        await User.destroy({
+            where: { id: id }
+        })
+        return res.status(200).json({
+            success: true,
+            user: userUpdate
+        });
     });
-    await User.destroy({
-        where: { id: id }
-    })
-    return res.status(200).json({
-        success: true,
-        user: userUpdate
-    });
-});
 module.exports = router;
