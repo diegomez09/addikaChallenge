@@ -13,54 +13,54 @@ const { create, update } = require('../middleware/role');
 // ===========================
 
 /**
-  * @api {POST} /post?token={token}&role={role} Create new post
+  * @api {POST} /post Create new post
   * @apiGroup Post
   * @apiDescription This method adds a new post in the database
   * @apiVersion  1.0.0
-  * @apiParam  {String} token JWT
-  * @apiParam  {String} role string
   * 
   *  @apiParamExample  {type} Request-Example:
    {
-   "role":"admin",
-   "title":"admin@mail.com",
-   "author":"123456",
-   "permissions":"ALL"
-    }
+    "title":"Titulolo",
+    "author":"Diego",
+    "body":"UN resumen"
+}
   *
   * @apiSuccessExample {type} Success-Response:
   * {
     "succes": true,
     "data": {
-        "role": "admin",
-        "title": "admin@mail.com",
-        "author": ":D",
-        "permissions":"ALL"
+        "id": 2,
+        "title": "Titulolo",
+        "author": "Diego",
+        "body": "UN resumen",
+        "updatedAt": "2021-03-07T02:26:52.128Z",
+        "createdAt": "2021-03-07T02:26:52.128Z"
     }
     }
   */
-router.post('/post', verifyToken, create, async (req, res) => {
-    try {
-        const post = await Post.create(req.body);
-        return res.status(200).json({
-            succes: true,
-            data: post
-        });
-    } catch (e) {
-        return res.status(422).json({
-            succes: false,
-            error: e
-        })
-    }
-})
+router.post('/post',
+    verifyToken,
+    create,
+    async (req, res) => {
+        try {
+            const post = await Post.create(req.body);
+            return res.status(200).json({
+                succes: true,
+                data: post
+            });
+        } catch (e) {
+            return res.status(422).json({
+                succes: false,
+                error: e
+            })
+        }
+    })
 
 /**
- * @api {GET} /post?token={token}&role={role} Get All Users
+ * @api {GET} /post Get All Posts
  * @apiGroup Post
  * @apiDescription This method returns all the posts registered in the data base
  * @apiVersion  1.0.0
- * @apiParam  {String} token JWT
- * @apiParam  {String} role string
  * 
  * @apiSuccessExample {type} Success-Response:
  * {
@@ -69,18 +69,19 @@ router.post('/post', verifyToken, create, async (req, res) => {
     "data": [
         {
             "id": 1,
-            "role": "admin",
-            "title": "admin@mail.com",
-            "permissions":true
-            "createdAt": "2021-03-06T19:19:41.000Z",
-            "updatedAt": "2021-03-06T19:19:41.000Z"
+            "title": "Titulolo",
+            "author": "Diego",
+            "body": "UN resumen",
+            "review": null,
+            "createdAt": "2021-03-07T02:04:51.000Z",
+            "updatedAt": "2021-03-07T02:04:51.000Z"
         }
     ]
     }
  * 
  */
 router.get('/post',
-    // [verifyToken], 
+    create,
     async (req, res) => {
         const posts = await Post.findAll({});
         return res.status(200).json({
@@ -91,7 +92,7 @@ router.get('/post',
     })
 
 /**
-  * @api {PUT} /post/{id}?token={token}&role={role} Update post
+  * @api {PUT} /post/{id} Update post
   * @apiGroup Post
   * @apiDescription This method adds a new post in the database
   * @apiVersion  1.0.0
@@ -101,26 +102,28 @@ router.get('/post',
   * 
   *  @apiParamExample  {type} Request-Example:
    {
-    "role":"admin",
-    "title":"admin@mail.com",
-    "permissions":"ALL"
-}
+    "title": "Titulolo",
+    "author": "1",
+    "body": "UN resumen"
+    }
   *
   * @apiSuccessExample {type} Success-Response:
   * {
     "success": true,
     "post": {
         "id": 1,
-        "role": "admin",
-        "title": "admin@mail.com",
-        "permissions": "ALL",
-        "createdAt": "2021-03-06T20:21:18.000Z",
-        "updatedAt": "2021-03-06T23:09:10.000Z"
+        "title": "Titulolo",
+        "author": "Diegsdoss",
+        "body": "UN resumen",
+        "review": null,
+        "createdAt": "2021-03-07T02:04:51.000Z",
+        "updatedAt": "2021-03-07T02:37:51.000Z"
     }
-}
+    }
   */
 router.put("/post/:id",
-    // [verifyToken],
+    verifyToken,
+    update,
     async (req, res) => {
         const post = await Post.update(req.body, {
             where: { id: req.params.id }
@@ -135,41 +138,40 @@ router.put("/post/:id",
     });
 
 /**
-   * @api {DELETE} /post/{id}?token={token}&role{role} Delete post
+   * @api {DELETE} /post/{id} Delete post
    * @apiGroup Post
    * @apiDescription This method do a logical delete of the post from de database
    * @apiVersion  1.0.0
    * @apiParam  {String} id Id of the document to be deleted
-   * @apiParam  {String} token JWT
-   * @apiParam  {String} role string
    * 
    * @apiSuccessExample {type} Success-Response:
    * {
     "success": true,
     "post": {
         "id": 1,
-        "role": "ADMIN",
-        "title": "admin@mail.com",
-        "permissions": "ALL",
-        "createdAt": "2021-03-06T23:20:29.000Z",
-        "updatedAt": "2021-03-06T23:20:29.000Z"
+        "title": "Titulolo",
+        "body": "UN resumen",
+        "review": null,
+        "createdAt": "2021-03-07T02:38:20.000Z",
+        "updatedAt": "2021-03-07T02:38:20.000Z"
     }
-}
+    }
    */
 router.delete("/post/:id",
-//  [verifyToken], 
- async (req, res) => {
-    let id = req.params.id;
-    const postUpdate = await Post.findByPk(req.params.id, {
-        where: { id: req.params.id },
-        attributes: { exclude: ['author'] }
+    verifyToken,
+    create,
+    async (req, res) => {
+        let id = req.params.id;
+        const postUpdate = await Post.findByPk(req.params.id, {
+            where: { id: req.params.id },
+            attributes: { exclude: ['author'] }
+        });
+        await Post.destroy({
+            where: { id: id }
+        })
+        return res.status(200).json({
+            success: true,
+            post: postUpdate
+        });
     });
-    await Post.destroy({
-        where: { id: id }
-    })
-    return res.status(200).json({
-        success: true,
-        post: postUpdate
-    });
-});
 module.exports = router;
