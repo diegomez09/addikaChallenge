@@ -8,16 +8,15 @@ module.exports = (sequelize, type) => {
             unique: true
         },
         userId: {
-            type: type.STRING,
+            type: type.INTEGER,
             allowNull: false
         },
         action: {
             type: type.STRING,
-            allowNull: false,
-            unique: true
+            allowNull: false
         },
         postId: {
-            type: type.STRING,
+            type: type.INTEGER,
             allowNull: false
         }
     })
