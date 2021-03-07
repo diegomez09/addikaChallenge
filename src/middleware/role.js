@@ -4,34 +4,15 @@ const jwt = require('jsonwebtoken');
 //==============
 
 let create = (req, res, next) => {
-    let token = req.query.token;
-    let decoded = jwt.decode(token);
-    let permissions = decoded.user.permissions;
-    if (permissions == 'CREATE' || permissions == 'ADMIN') next();
-    else res.status(422).json({
-        succes: false,
-        error: 'Access denied'
-    })
+    if (req.user.permissions != 'UPDATE') next();
 }
 
 let update = (req, res, next) => {
-    let token = req.query.token;
-    let decoded = jwt.decode(token);
-    let permissions = decoded.user.permissions;
-    if (permissions == 'UPDATE' || permissions == 'ADMIN') next();
-    else res.status(422).json({
-        succes: false,
-        error: 'Access denied'
-    })
+    if (req.user.permissions != 'CREATE') next();
 }
 
 let adminRole = (req, res, next) => {
-    let role = req.query.role
-    if (role == 'ADMIN') next();
-    return res.status(422).json({
-        succes: false,
-        error: 'Access denied'
-    })
+    if (req.user.permissions == 'ADMIN') next();
 }
 module.exports = {
     create,
