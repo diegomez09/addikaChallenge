@@ -17,6 +17,7 @@ const { adminRole } = require('../middleware/role');
   * @apiGroup User
   * @apiDescription This method adds a new user in the database
   * @apiVersion  1.0.0
+  * @apiAuth Bearer Token {token}
   * 
   *  @apiParamExample  {type} Request-Example:
    {
@@ -68,8 +69,7 @@ router.post('/user', [
  * @apiGroup User
  * @apiDescription This method returns all the users registered in the data base
  * @apiVersion  1.0.0
- * @apiParam  {String} token JWT
- * @apiParam  {String} role string
+ * @apiAuth Bearer Token {token}
  * 
  * @apiSuccessExample {type} Success-Response:
  * {
@@ -109,9 +109,8 @@ router.get('/user',
   * @apiGroup User
   * @apiDescription This method adds a new user in the database
   * @apiVersion  1.0.0
+  * @apiAuth Bearer Token {token}
   * @apiParam  {String} id Id of the document to be updated
-  * @apiParam  {String} token JWT
-  * @apiParam  {String} role string
   * 
   *  @apiParamExample  {type} Request-Example:
    {
@@ -155,6 +154,7 @@ router.put("/user/:id",
    * @apiGroup User
    * @apiDescription This method do a logical delete of the user from de database
    * @apiVersion  1.0.0
+   * @apiAuth Bearer Token {token}
    * @apiParam  {String} id Id of the document to be deleted
    * @apiSuccessExample {type} Success-Response:
    * {
