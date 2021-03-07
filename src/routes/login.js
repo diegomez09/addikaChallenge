@@ -44,13 +44,12 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({
         where: { email: body.email }
     });
-    if (user == null) {
+    if (!user) {
         return res.status(400).json({
             success: false,
             message: "Incorrect credentials",
         });
     }
-
     //Verify password
     try {
         if (!bcrypt.compareSync(body.password, user.dataValues.password)) {
