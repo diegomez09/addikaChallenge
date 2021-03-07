@@ -11,11 +11,7 @@ let verifyToken = (req, res, next) => {
     jwt.verify(token, SEED, (error, decoded) => {
         //Verify errors
         if (error) {
-            return res.status(403).json({
-                success: false,
-                error,
-                message: "Invalid token"
-            });
+            return
         }
         req.user = decoded.user;
         next();
