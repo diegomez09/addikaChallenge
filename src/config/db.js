@@ -8,6 +8,7 @@ const Sequelize = require('sequelize');
 const UserModel = require('../models/user');
 const PostModel = require('../models/post');
 const ReviewModel = require('../models/review');
+const LogModel = require('../models/log');
 //Initialize connection
 const sequelize = new Sequelize('addika', 'user', 'rFdzPKkb3N', {
   host: 'localhost',
@@ -24,7 +25,9 @@ const sequelize = new Sequelize('addika', 'user', 'rFdzPKkb3N', {
 const User = UserModel(sequelize, Sequelize);
 const Post = PostModel(sequelize, Sequelize);
 const Review = ReviewModel(sequelize, Sequelize);
+const Log = LogModel(sequelize, Sequelize);
 
+// Post.hasMany(Review, { foreignKey: 'review' });
 sequelize.sync({ force: false })
   .then(() => {
     console.log('Tablas creadas');
@@ -33,5 +36,6 @@ sequelize.sync({ force: false })
 module.exports = {
   User,
   Post,
-  Review
+  Review,
+  Log
 }
