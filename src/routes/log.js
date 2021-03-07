@@ -9,6 +9,30 @@ const { check, validationResult } = require('express-validator');
 const { adminRole } = require('../middleware/role');
 const { Op } = require('sequelize');
 
+/**
+ * @api {GET} /post Get All Logs
+ * @apiGroup Log
+ * @apiDescription This method returns all the posts registered in the data base
+ * @apiVersion  1.0.0
+ * @apiAuth Bearer Token {token}
+ * 
+ * @apiSuccessExample {type} Success-Response:
+ * {
+    "succes": true,
+    "total": 1,
+    "data": [
+        {
+            "id": 1,
+            "userId": 1,
+            "action": "PUT",
+            "postId": 1,
+            "createdAt": "2021-03-07T23:06:08.000Z",
+            "updatedAt": "2021-03-07T23:06:08.000Z"
+        }
+    ]
+}
+ * 
+ */
 router.get('/log',
     verifyToken,
     adminRole,
