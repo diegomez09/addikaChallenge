@@ -10,6 +10,7 @@ require('./config/db');
 const bodyParser = require('body-parser');
 const userRouter = require('./routes/user')
 const loginRouter = require('./routes/login');
+const postRouter = require('./routes/post');
 // ===========================
 // Initializations
 // ===========================
@@ -20,6 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(userRouter);
 app.use(loginRouter);
+app.use(postRouter);
 // ===========================
 // Middleware
 // ===========================
