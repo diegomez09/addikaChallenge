@@ -18,6 +18,13 @@ module.exports = (sequelize, type) => {
         body: {
             type: type.STRING,
             allowNull: false
+        },
+        review: {
+            type: type.STRING,
+        },
+        week: {
+            type: type.BOOLEAN,
+            allowNull: true
         }
     })
 }
