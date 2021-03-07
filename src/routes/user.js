@@ -7,7 +7,7 @@ const bcryptjs = require('bcryptjs');
 const { verifyToken } = require("../middleware/auth");
 const { User } = require('../config/db');
 const { check, validationResult } = require('express-validator');
-const { verifyRole } = require('../middleware/role');
+const { adminRole } = require('../middleware/role');
 // ===========================
 // Initializations
 // ===========================
@@ -22,7 +22,7 @@ const { verifyRole } = require('../middleware/role');
   * 
   *  @apiParamExample  {type} Request-Example:
    {
-   "role":"admin",
+   "role":"ADMIN",
    "email":"admin@mail.com",
    "password":"123456",
    "permissions":"ALL"
@@ -32,7 +32,7 @@ const { verifyRole } = require('../middleware/role');
   * {
     "succes": true,
     "data": {
-        "role": "admin",
+        "role": "ADMIN",
         "email": "admin@mail.com",
         "password": ":D",
         "permissions":"ALL"
@@ -40,8 +40,7 @@ const { verifyRole } = require('../middleware/role');
     }
   */
 router.post('/user', [
-    verifyToken,
-    verifyRole,
+    //verifyToken,
     check('role', 'Role is required').not().isEmpty(),
     check('email', 'Email is required').not().isEmpty(),
     check('password', 'Password is required').not().isEmpty(),
@@ -90,18 +89,20 @@ router.post('/user', [
     }
  * 
  */
-router.get('/user', [verifyToken, verifyRole], async (req, res) => {
-    const users = await User.findAll({
-        attributes: {
-            exclude: ['password']
-        }
-    });
-    return res.status(200).json({
-        succes: true,
-        total: users.length,
-        data: users
-    });
-})
+router.get('/user',
+    //[verifyToken],
+    async (req, res) => {
+        const users = await User.findAll({
+            attributes: {
+                exclude: ['password']
+            }
+        });
+        return res.status(200).json({
+            succes: true,
+            total: users.length,
+            data: users
+        });
+    })
 
 /**
   * @api {PUT} /user/{id}?token={token}&role={role} Update user
@@ -132,19 +133,21 @@ router.get('/user', [verifyToken, verifyRole], async (req, res) => {
     }
 }
   */
-router.put("/user/:id", [verifyToken, verifyRole], async (req, res) => {
-    const user = await User.update(req.body, {
-        where: { id: req.params.id }
-    }).catch();
-    const userUpdate = await User.findByPk(req.params.id, {
-        where: { id: req.params.id },
-        attributes: { exclude: ['password'] }
+router.put("/user/:id",
+    //[verifyToken],
+    async (req, res) => {
+        const user = await User.update(req.body, {
+            where: { id: req.params.id }
+        }).catch();
+        const userUpdate = await User.findByPk(req.params.id, {
+            where: { id: req.params.id },
+            attributes: { exclude: ['password'] }
+        });
+        return res.status(200).json({
+            success: true,
+            user: userUpdate,
+        });
     });
-    return res.status(200).json({
-        success: true,
-        user: userUpdate,
-    });
-});
 
 /**
    * @api {DELETE} /user/{id}?token={token}&role{role} Delete user
@@ -168,7 +171,9 @@ router.put("/user/:id", [verifyToken, verifyRole], async (req, res) => {
     }
 }
    */
-router.delete("/user/:id", [verifyToken, verifyRole], async (req, res) => {
+router.delete("/user/:id",
+ //[verifyToken],
+  async (req, res) => {
     let id = req.params.id;
     const userUpdate = await User.findByPk(req.params.id, {
         where: { id: req.params.id },
@@ -179,7 +184,7 @@ router.delete("/user/:id", [verifyToken, verifyRole], async (req, res) => {
     })
     return res.status(200).json({
         success: true,
-        user:userUpdate
+        user: userUpdate
     });
 });
 module.exports = router;
